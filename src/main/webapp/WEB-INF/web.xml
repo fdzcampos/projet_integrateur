@@ -43,4 +43,34 @@
     <servlet-name>Servlet_index</servlet-name>
     <url-pattern>/Servlet_index</url-pattern>
   </servlet-mapping>
+    <servlet>
+    <description></description>
+    <display-name>Servlet_report</display-name>
+    <servlet-name>Servlet_report</servlet-name>
+    <servlet-class>servlets.Servlet_report</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Servlet_report</servlet-name>
+    <url-pattern>/Servlet_report</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>Servlet_forum</display-name>
+    <servlet-name>Servlet_forum</servlet-name>
+    <servlet-class>servlets.Servlet_forum</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Servlet_forum</servlet-name>
+    <url-pattern>/Servlet_forum</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>Servlet_partners</display-name>
+    <servlet-name>Servlet_partners</servlet-name>
+    <servlet-class>servlets.Servlet_partners</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Servlet_partners</servlet-name>
+    <url-pattern>/Servlet_partners</url-pattern>
+  </servlet-mapping>
 </web-app>
