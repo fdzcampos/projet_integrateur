@@ -71,6 +71,14 @@
 	                       </a>
                         </p>
                     </li>
+                    <li>
+                    	<p>
+	                       <a href="forum">
+	                           <i class="pe-7s-bell"></i>
+	                           Forum
+	                       </a>
+                        </p>
+                    </li>
 	                <li>
                     	<p>
 	                       <a href="notifications.jsp">

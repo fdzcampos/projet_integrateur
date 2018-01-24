@@ -298,7 +298,7 @@ input:focus {
 
 .sidebar .logo-tim {
     border-radius: 50%;
-    border: 1px solid #333;
+    border: 1px solid #fff;
     display: block;
     height: 61px;
     width: 61px;
@@ -397,7 +397,7 @@ input:focus {
 
 .sidebar .logo-tim {
     border-radius: 50%;
-    border: 1px solid #333;
+    border: 1px solid #fff;
     display: block;
     height: 61px;
     width: 61px;
@@ -1554,7 +1554,7 @@ fieldset[disabled] .btn-neutral.active {
     margin-top: -1px;
     margin-bottom: -1px;
     z-index: 100;
-    color: #333;
+    color: #fff;
     background: #fff;
 }
 
@@ -2302,7 +2302,7 @@ fieldset[disabled] .btn-neutral.active {
 
 .card .description {
     font-size: 14px;
-    color: #333;
+    color: #fff;
 }
 
 .card .footer {

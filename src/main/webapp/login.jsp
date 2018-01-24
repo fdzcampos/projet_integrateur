@@ -110,6 +110,9 @@
 		                        <div class="row">
 		                            <div class="col-md-(6)">
 		                                
+		                                <style>
+		                                	input[type=email] { color:#000;}
+		                                </style>
 		                             <form action="servlet_login" >
 		                                  <div class="form-group">
 		                                    <label for="email">Email address:</label>

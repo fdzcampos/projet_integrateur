@@ -56,6 +56,8 @@ public class Servlet_forum extends HttpServlet {
 	    
 	    boolean moreTopics = topics.size() > 20;
 	    
+	    System.out.println("doGet");
+	    
 		request.setAttribute("topics", topics);
 		request.setAttribute("moreTopics", moreTopics);
 		request.getRequestDispatcher("forum.jsp").forward(request, response);
@@ -68,7 +70,7 @@ public class Servlet_forum extends HttpServlet {
 		
 		String messageText = request.getParameter("message"); // A faire correspondre avec les noms des champs du formulaire
 		String title = request.getParameter("title");
-		int userId = 2;
+		int userId = 6;
 		// int userId = request.getSession().getAttribute("userId"); // Le vrai userId
 		
 		JSONObject jsonBody = new JSONObject();
@@ -76,9 +78,9 @@ public class Servlet_forum extends HttpServlet {
 	    JSONObject user = new JSONObject();
 	    user.put("id", new Integer(userId));
 	  
-	    List<Message> messages = new ArrayList<Message>();
-	    Message message = new Message();
-	    message.setText(messageText);
+	    List<JSONObject> messages = new ArrayList<JSONObject>();
+	    JSONObject message = new JSONObject();
+	    message.put("text", messageText);
 	    messages.add(message);
 	    
 	    jsonBody.put("title", title);
@@ -90,12 +92,14 @@ public class Servlet_forum extends HttpServlet {
 		client = ClientBuilder.newClient();
 	    target = client.target("http://localhost:8080/SOA_Project/webapi/forum/topic");
 	    
+	    System.out.println("Servlet sends POST: " + jsonBody.toJSONString());		
 	    Response serviceResponse = target.request(MediaType.APPLICATION_JSON).post(postBody);
-	    
+	    //System.out.println("Service response " + serviceResponse.getStatus() + " | " + );
 	    
 	    // ADD ANY KAFKA THINGY HERE
 
-		request.getRequestDispatcher("/forum/topic").forward(request, response);
+	    request.getSession().setAttribute("idTopic", serviceResponse.readEntity(Topic.class).getId());
+		request.getRequestDispatcher("/topic").forward(request, response);
 	}
 
 }

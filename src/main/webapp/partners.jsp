@@ -116,10 +116,25 @@
 									        </div>
 								        </li>
 									</c:forEach>
+									
+
+									
+									
  <!--  
+ 
+ 									<script>
+										var gpsPoints = {"route": [{"lat" : 0, "lon" : 0}, {"lat" : 0, "lon" : 0}]};
+										var json = JSON.parse(gpsPoints);
+										
+									</script>
+									
                                 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
                                 <script>
                                 	$(document).ready(function(){
+                                		
+                                		
+                                		
+                                		gpsPoints
                                 		$.get( "webapi/partners/all", function(data) {	
                                 			for (var i = 0; i < data.length; i++) {
                                 				var partnerElement = $("<li></li>");

@@ -19,13 +19,17 @@ import javax.ws.rs.core.MediaType;
 @Path("forum")
 public class ForumManager {
 
-	static final private int topicsPerPage = 21;
-	static final private int messagesPerPage = 21;
+	static final private int topicsPerPage = 20;
+	static final private int messagesPerPage = 20;
 	
 	@POST
 	@Path("/topic")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void createTopic(Topic topic){
+	@Produces(MediaType.APPLICATION_JSON)
+	public Topic createTopic(Topic topic){
+		System.out.println("CREATE TOPIC");		
+		Topic topicRes = new Topic();
+		
 		try {
 			Class.forName("org.postgresql.Driver");
 		} catch (ClassNotFoundException e) {
@@ -43,19 +47,33 @@ public class ForumManager {
 		try {		
 			connection = DriverManager.getConnection("jdbc:postgresql://18.194.236.50:5432/ilsoa", "ilsoa", "ilsoa");
 			state = connection.createStatement();
-			String query = "INSERT INTO topics(title, date, userId) VALUES ('" + topic.getTitle() + "', now(), " + topic.getUser().getId() + ");";
-			query += "INSERT INTO messages(text, date, topicId, userId) VALUES ('" + topic.getMessages().get(0).getText() + "', now(), ( SELECT id FROM topics ORDER BY id DESC LIMIT 1 ), " + topic.getUser().getId() + ");";
-			query += "UPDATE topics SET nbMessages = 1 WHERE id = ( SELECT id FROM topics ORDER BY id DESC LIMIT 1 );";
+			String query = "INSERT INTO topics(title, date, userId) VALUES ('" + topic.getTitle() + "', now(), " + topic.getUser().getId() + ") RETURNING id, title;";
 			ResultSet res = state.executeQuery(query);
 			System.out.println(query);		
 			
+			if(res.next()){
+				System.out.println("Res query: " + res.getInt("id") + " " + res.getInt("id"));
+				topicRes.setId(res.getInt("id"));
+				topicRes.setTitle(res.getString("title"));
+			}else{
+				topicRes.setId(-1);
+			}
+			
+				
+			query = "INSERT INTO messages(text, date, topicId, userId) VALUES ('" + topic.getMessages().get(0).getText() + "', now(), ( SELECT id FROM topics ORDER BY id DESC LIMIT 1 ), " + topic.getUser().getId() + ");";
+			query += "UPDATE topics SET nbMessages = 1 WHERE id = " + topicRes.getId() + ";";
+			
+			//( SELECT id FROM topics ORDER BY id DESC LIMIT 1 )
+
 			 // close resources
 			 res.close();
 			 state.close();
 			 connection.close();
-		
+			 return topicRes;
+			 
 		} catch (SQLException e) {
-
+			e.printStackTrace();
+			return topicRes;
 		}finally{		// close resources
 			
 			try{	
@@ -101,8 +119,9 @@ public class ForumManager {
 			String query = "SELECT t.id, t.title, t.date, t.nbMessages, u.username "
 						 + "FROM topics t, users u "
 						 + "WHERE t.userId = u.id "
+						 + "ORDER BY t.date ASC "
 						 + "OFFSET " + topicsPerPage * (page - 1) + " "
-						 + "LIMIT " + topicsPerPage * page + ";";
+						 + "LIMIT " + (topicsPerPage * page + 1)+ ";";
 			ResultSet res = state.executeQuery(query);
 						
 			System.out.println(query);
@@ -202,15 +221,16 @@ public class ForumManager {
 	@GET
 	@Path("/topic/{idTopic}/page/{idPage}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public ArrayList<Message> getMessages(@PathParam("idTopic") int topic,
+	public Topic getMessages(@PathParam("idTopic") int idTopic,
 										@PathParam("idPage") int page){
+		Topic topic = new Topic();
 		ArrayList<Message> messages = new ArrayList<Message>();
 		
 		try {
 			Class.forName("org.postgresql.Driver");
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
-			return messages;
+			return topic;
 		}
 			
 		/*
@@ -228,9 +248,10 @@ public class ForumManager {
 			String query = "SELECT DISTINCT m.text, m.date, u.username "
 						 + "FROM messages m, users u, topics t "
 						 + "WHERE m.userId = u.id "
-						 + "AND m.topicId = " + topic + " "
+						 + "AND m.topicId = " + idTopic + " "
+						 + "ORDER BY m.date ASC "
 						 + "OFFSET " + messagesPerPage * (page - 1) + " "
-						 + "LIMIT " + messagesPerPage * page + ";";
+						 + "LIMIT " + (messagesPerPage * page + 1) + " ";
 			ResultSet res = state.executeQuery(query);
 						
 			System.out.println(query);
@@ -240,22 +261,32 @@ public class ForumManager {
 	        	user.setUsername(res.getString("username"));
 	        	Message message = new Message();
 	        	message.setText(res.getString("text"));
-	        	message.setDate(res.getTimestamp("date"));
+	        	//message.setDate(res.getTimestamp("date"));
 	        	message.setUser(user);
 	    		messages.add(message);
 	         }
 	         
+			 query = "SELECT title FROM topics where id = " + idTopic + ";";
+			 res = state.executeQuery(query);
+	         
+			 if( res.next() ){
+				 topic.setId(idTopic);
+				 topic.setTitle(res.getString("title"));
+				 topic.setMessages(messages);
+				 System.out.println(idTopic + ", " + res.getString("title") + ", " + messages);
+			 }
+			 
 	         // close resources
 	         res.close();
 	         state.close();
 	         connection.close();
 	         
-	         return messages;
+	         return topic;
 		
 		} catch (SQLException e) {
 			
 			e.printStackTrace();
-			return messages;
+			return topic;
 		
 		}finally{		// close resources
 			
