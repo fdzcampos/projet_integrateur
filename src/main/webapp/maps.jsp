@@ -275,13 +275,14 @@
                                 // test to have coords in a variable
                                 var coordinates1;
                                 var coordinates2; 
-                                var long1; 
-                                var long2; 
-                                var lat1; 
-                                var lat2; 
+                                var long1=null; 
+                                var long2=null; 
+                                var lat1=null; 
+                                var lat2=null; 
                                 var flip=false; 
                                 var deleteLayerLine = false; 
                                 var id = 0; 
+                                var idLine = 0; 
                                 
                        /*             var layers = map.getStyle().layers;
                                     // Find the index of the first symbol layer in the map style
@@ -400,11 +401,57 @@
                                                 });
                                                  
                                                 
+									var lineCoord = { 
+											"route": [ 
+												{ 
+													"lat": 8.656014599557707, 
+													"lon": -56.367208957721914
+												}, 
+												{ 
+													"lat": 7.261360896162202, 
+													"lon": -42.02343106263544
+												}, 
+												{ 
+													"lat": 8.654033861251491, 
+													"lon": -30.210939645702183
+												}, 
+												{ 
+													"lat": 12.523689086199, 
+													"lon": -22.054685354164434
+												}, 
+												{ 
+													"lat": 14.849806005146106, 
+													"lon": -16.816406250135202
+												} 
+												]
+											}; 
+									
+									var listCoords = lineCoord.route; // on recup la liste de paires de long/lat 
+									var goodCoords=[]; 
+									
+									for ( i = 0 ; i < listCoords.length ; i++){ 
+										
+										goodCoords.push([listCoords[i].lon, listCoords[i].lat]) ; 
+									}
+									
+									window.alert(JSON.stringify(goodCoords)); 
+									
 
+										
                                                  // Add a line between coordinates 1 and 2 
+                                                 
+                                           var layerLineExists = map.getLayer('route'+(idLine-1)); 
+                                                 if ( elementExists !=null) {
+                                                     
+                                                 console.log("hello " + layerLineExists.id  + " " + idLine ); 
 
-/*                                            map.addLayer({
-                                                    "id": "route",
+                                                    map.removeLayer("route"+(idLine-1)); 
+                                                 }
+                                                   idLine++; 
+
+
+                                            map.addLayer({
+                                                    "id": "route"+id,
                                                     "type": "line",
                                                     "source": {
                                                         "type": "geojson",
@@ -413,10 +460,7 @@
                                                             "properties": {},
                                                             "geometry": {
                                                                 "type": "LineString",
-                                                                "coordinates": [
-                                                                    [long1, lat1],
-                                                                    [long2, lat2] 
-                                                                ] 
+                                                                "coordinates": goodCoords
                                                             }
                                                         }
                                                     },
@@ -428,14 +472,15 @@
                                                         "line-color": "#f00",
                                                         "line-width": 8
                                                     }
-                                                }); */// , firstSymbolId);
+                                                }); // , firstSymbolId);
 
-                                                deleteLayerLine= true; 
                                             }
 
 
                                           document.getElementById('info_click').innerHTML = 
                                               'First point: ' + coordinates1 + '<br />' + 'Second point:' + coordinates2 ;
+                                          
+                                          
 
 
 
@@ -452,6 +497,43 @@
                                
                                   
                               //       });
+                              
+                                          var element = document.getElementById("buttonCalculateDistance"); 
+                                          element.addEventListener("click", sendToCalculator);
+
+                                          function sendToCalculator() {
+                                        	  if (long1==null || lat1==null || long2==null || lat2==null){ 
+                                        		  window.alert("Please select two points before clicking.")
+                                        		  
+                                        	  }
+                                        	  else { 
+	                                        	  window.alert("YO YOU CLICKED BRUH"); 
+	                                        	  gpsPoints = {"route": [{"lat": lat1, "lon": long1}, {"lat":lat2, "lon":long2}]}; 
+	
+	                                        	  window.alert("YOu suck"); 
+	                                        	  
+	                                        	  var xhttp = new XMLHttpRequest(); 
+	                                        	  
+	                                        	  xhttp.onreadystatechange=function() { 
+	                                            	  window.alert("*hacker voice* Im in"); 
+	
+	                                        		  if (this.readyState==4 && this.status==200){ 
+	                                        			  
+	                                        			  window.alert(this.responseText); 
+	                                        		  }                            
+	                                        		  
+	                                        	  }; 
+	                                        	  
+	                                        	  window.alert("let's open yo"); 
+	
+	                                        	  xhttp.open("POST", "webapi/shortestpath/route", false); 
+	                                        	  window.alert("snowhite"); 
+	
+	                                        	  xhttp.send(JSON.stringify(gpsPoints)); 
+	                                        	  
+	                                        	    window.alert("sent to services"); 
+                                        	  }
+                                        	}
                                 
                                                             
                                 
