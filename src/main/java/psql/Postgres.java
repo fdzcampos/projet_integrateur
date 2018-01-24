@@ -31,34 +31,32 @@ public class Postgres {
 		Statement state = null;
 		try {
 					
-			connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/project", "postgres",
-				"admin");
+			connection = DriverManager.getConnection("jdbc:postgresql://18.194.236.50:5432/ilsoa", "ilsoa","ilsoa");
 			state = connection.createStatement();
-			String query = "SELECT id, email FROM users WHERE email='" + user + "' and hash='" + pwd +"';";
+			
+			
+			String query = "SELECT id, isadmin FROM users WHERE email='"+user+"' and hash=crypt('"+pwd+"',hash);";
 			ResultSet res = state.executeQuery(query);
-						
-	         //Retrieve by column name         
-	         int count = 0;
-	         int id = 0;
-	         String usr = null;
-	         
-	         while( res.next() ) {
-	        	 count ++;
-	        	 id  = res.getInt("id");
-		         usr = res.getString("email");
-	         }
-	         
+			
+			//Retrieve by column name         
+	        int count = 0;
+	        boolean isadmin = false;
+	        while( res.next() ) {
+	        	count += 1 ;
+	        	isadmin = res.getBoolean("isadmin");
+	        }			
+			
 	         // close resources
 	         res.close();
 	         state.close();
 	         connection.close();
-	         
-	         if( count == 1) {
-	        	 return true;
-	         } else {
-	        	 throw new noUserWithThatNameException(usr);
-	         }
 		
+	         if( count == 1) {
+		        	return true;
+		        } else {
+		        	 throw new noUserWithThatNameException(user);
+		        }
+	         
 		} catch (SQLException e) {
 		
 			System.out.println("Connection Failed! Check output console");
@@ -225,6 +223,75 @@ public class Postgres {
 		
 		return false;
 	}
+	
+	
+	/**
+	 * 
+	 * @param email
+	 * @return true if user exists, false otherwise
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 */
+	public static boolean isAdmin(String email) throws ClassNotFoundException, SQLException {
+		
+		try {
+			Class.forName("org.postgresql.Driver");
+		} catch (ClassNotFoundException e) {
+			System.out.println("Where is your PostgreSQL JDBC Driver? Include in your library path!");
+			e.printStackTrace();
+			return false;
+		}
+			
+		Connection connection = null;
+		Statement state = null;
+		try {
+					
+			connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/project", "postgres","admin");
+			state = connection.createStatement();
+			
+			String qid = "SELECT isadmin FROM users WHERE email='" + email +"';";
+			ResultSet resId = state.executeQuery(qid);
+			
+			//if the query resultset is empty the querys result was null
+			boolean isadmin = false;
+			while( resId.next() ) {
+				isadmin = resId.getBoolean("isadmin");
+			}
+			
+	         // close resources
+	         resId.close();
+	         state.close();
+	         connection.close();
+	         
+	         return isadmin;
+	         
+		} catch (SQLException e) {
+		
+			System.out.println("Connection Failed! Check output console");
+			e.printStackTrace();
+			return false;
+		
+		}finally{		// close resources
+			
+			try{
+				
+				if( state != null )
+					state.close();
+				
+			}catch( SQLException se2 ) {
+				
+			}try{
+				
+				if( connection != null) 
+					connection.close();
+				
+			}catch(SQLException se){
+				
+				se.printStackTrace();
+			}
+		}
+	}
+	
 	
 	
 }
