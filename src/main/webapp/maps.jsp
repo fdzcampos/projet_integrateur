@@ -80,6 +80,8 @@
 
 <div class="wrapper">
     <%@ include file="sidebar.jsp" %>
+        
+        
     <div class="main-panel">
 		<nav class="navbar navbar-default navbar-fixed">
             <div class="container-fluid">
@@ -162,17 +164,16 @@
         </nav>
 
         
-        <!-- some maps examples from MapBox-->
-        
-                                    <style>
+        <style>
                                 #menu {
                                     position: absolute;
                                     top: 0; 
                                     left: 0 ;
-                                    background: #fff;
+                                    background: #000;
                                     padding: 10px;
                                     font-family: 'Open Sans', sans-serif;
-                                    z-index: 10000
+                                    z-index: 10000; 
+                                    opacity: 0.7; 
                                 }
                                         
                                     /* to display coordinates*/    
@@ -208,9 +209,10 @@
                                         z-index: 1000
                                 }
 
-                            </style>
-
+        </style>
+                            
                             <div id='map'></div>
+        
                             <pre id='info'></pre>
                             <div id='menu'>
                                 <input id='basic' type='radio' name='rtoggle' value='basic' checked='checked'>
@@ -225,17 +227,22 @@
                                 <label for='dark'>dark</label>
                                 <input id='satellite' type='radio' name='rtoggle' value='satellite'>
                                 <label for='satellite'>satellite</label>
+                                <div > 
+                                    <button type="button" id="buttonCalculateDistance" class="btn btn-info" onclick="location.href='#';" >Calculate distance</button>
+                                </div>
                             </div>
-                            <pre id='info_click'> You clicked! </pre>
-                            
-                            <script>
+                            <pre id='info_click'> Select your origin and destination. </pre>
+        
+                           
+        
+                        <script>
                             
                             mapboxgl.accessToken = 'pk.eyJ1Ijoib2JhZGFvdWkiLCJhIjoiY2pjaXJld3B6MDg0ZzJ3bHh1NXgyYWc5eCJ9.5WB96eoC4E7TDB5P8ofsQw';
                             var map = new mapboxgl.Map({
                                 container: 'map',
                                 style: 'mapbox://styles/mapbox/basic-v9',
-                                zoom: 13,
-                                center: [4.899, 52.372]
+                                zoom: 2,
+                                center: [-120, 50]
                             });
 
                             var layerList = document.getElementById('menu');
@@ -274,6 +281,7 @@
                                 var lat2; 
                                 var flip=false; 
                                 var deleteLayerLine = false; 
+                                var id = 0; 
                                 
                        /*             var layers = map.getStyle().layers;
                                     // Find the index of the first symbol layer in the map style
@@ -286,6 +294,7 @@
                                     }*/
 
                                          map.on('click', function(e){ 
+
                                              if (flip==false){ 
                                                  coordinates1 = JSON.stringify(e.point) + '<br />' +
                                                 // e.lngLat is the longitude, latitude geographical position of the event
@@ -294,38 +303,104 @@
                                                  lat1= e.lngLat.lat //JSON.stringify(e.lngLat).substr(32, 48);
                                                  flip=true; 
                                                  
-                                                /* if (deleteLayerLine==true){ 
-                                                    map.setLayoutProperty('route', 'visibility', 'none'); 
-                                                     deleteLayerLine= false; 
+                                                 
+                                                 var elementExists = map.getLayer('points'+(id-1));
+                                                 if ( elementExists !=null) {
+                                                     
+                                                    console.log("coucou " + elementExists.id  + " " + id ); 
+
+                                                     
+                                                    map.removeLayer("points"+(id-1)); 
                                                  }
-*/
+                                                 
+                                                id++; 
+
+                                                                                                  
+                                                  map.addLayer({
+                                                    "id": "points"+id,
+                                                    "type": "symbol",
+                                                    "source": {
+                                                        "type": "geojson",
+                                                        "data": {
+                                                            "type": "FeatureCollection",
+                                                            "features": [{
+                                                                "type": "Feature",
+                                                                "geometry": {
+                                                                    "type": "Point",
+                                                                    "coordinates": [long1, lat1]
+                                                                },
+                                                                "properties": {
+                                                                    "title": "FROM",
+                                                                    "icon": "monument"
+                                                                }
+                                                            }]
+                                                        }
+                                                    },
+                                                    "layout": {
+                                                        "icon-image": "{icon}-15",
+                                                        "text-field": "{title}",
+                                                        "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+                                                        "text-offset": [0, 0.6],
+                                                        "text-anchor": "top"
+                                                    }
+                                                });
+                                         
 
 
                                              }
                                             else { 
-                                            	coordinates2 = JSON.stringify(e.point) + '<br />' +
+                                            coordinates2 = JSON.stringify(e.point) + '<br />' +
                                                 // e.lngLat is the longitude, latitude geographical position of the event
                                                 JSON.stringify(e.lngLat);
 
 
 
                                                 long2=  e.lngLat.lng  ; //JSON.stringify(e.lngLat).substr(7, 17); 
-                                                lat2= e.lngLat.lat ; //JSON.stringify(e.lngLat).substr(32, 48);
-                                                 
-                                                //window.alert("neo4j incoming");
+                                                 lat2= e.lngLat.lat ; //JSON.stringify(e.lngLat).substr(32, 48);
+                                                 flip= false;
+                                              
+
+                                                var elementExists = map.getLayer('points'+(id-1)); 
+                                                 if ( elementExists !=null) {
+                                                     
+                                                 console.log("hello " + elementExists.id  + " " + id ); 
+
+                                                    map.removeLayer("points"+(id-1)); 
+                                                 }
+                                                   id++; 
+
                                                 
-                                                var gpsPoints = {"route": [{"lat" : lat1, "lon" : long1}, {"lat" : lat2, "lon" : long2}]};
-         										 
-                                                xhttp.onreadystatechange = function() {
-	                                            	if (this.readyState == 4 && this.status == 200) {
-	                                               		window.alert(this.responseText);
-	                                               	}
-	                                            };
-	                                            
-	                                            xhttp.open("POST", "webapi/shortestpath/route", false);
-	                                            xhttp.send(JSON.stringify(gpsPoints)); 
+                                               map.addLayer({
+                                                    "id": "points"+id,
+                                                    "type": "symbol",
+                                                    "source": {
+                                                        "type": "geojson",
+                                                        "data": {
+                                                            "type": "FeatureCollection",
+                                                            "features": [{
+                                                                "type": "Feature",
+                                                                "geometry": {
+                                                                    "type": "Point",
+                                                                    "coordinates": [long2, lat2]
+                                                                },
+                                                                "properties": {
+                                                                    "title": "TO",
+                                                                    "icon": "harbor"
+                                                                }
+                                                            }]
+                                                        }
+                                                    },
+                                                    "layout": {
+                                                        "icon-image": "{icon}-15",
+                                                        "text-field": "{title}",
+                                                        "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+                                                        "text-offset": [0, 0.6],
+                                                        "text-anchor": "top"
+                                                    }
+                                                });
                                                  
-         										 
+                                                
+
                                                  // Add a line between coordinates 1 and 2 
 
 /*                                            map.addLayer({
@@ -355,7 +430,6 @@
                                                     }
                                                 }); */// , firstSymbolId);
 
-                                                  flip= false; 
                                                 deleteLayerLine= true; 
                                             }
 
@@ -379,14 +453,13 @@
                                   
                               //       });
                                 
-                                
-                                
-                                
+                                                            
                                 
                             </script>
         
+        
 
-    </div>
+      </div>
 </div>
 
 
