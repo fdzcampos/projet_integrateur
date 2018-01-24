@@ -43,7 +43,7 @@
     <servlet-name>Servlet_index</servlet-name>
     <url-pattern>/Servlet_index</url-pattern>
   </servlet-mapping>
-    <servlet>
+  <servlet>
     <description></description>
     <display-name>Servlet_report</display-name>
     <servlet-name>Servlet_report</servlet-name>
@@ -72,5 +72,15 @@
   <servlet-mapping>
     <servlet-name>Servlet_partners</servlet-name>
     <url-pattern>/Servlet_partners</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>Servlet_topic</display-name>
+    <servlet-name>Servlet_topic</servlet-name>
+    <servlet-class>servlets.Servlet_topic</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Servlet_topic</servlet-name>
+    <url-pattern>/Servlet_topic</url-pattern>
   </servlet-mapping>
 </web-app>

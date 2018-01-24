@@ -53,7 +53,7 @@ public class Servlet_login extends HttpServlet {
 			
 			HttpSession session = request.getSession();
 			session.setAttribute("user", email);
-			
+		
 			getServletContext().getRequestDispatcher("/dashboard.jsp").forward(request, response);
 		}			
 	}

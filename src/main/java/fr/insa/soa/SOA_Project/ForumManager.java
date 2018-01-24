@@ -19,8 +19,8 @@ import javax.ws.rs.core.MediaType;
 @Path("forum")
 public class ForumManager {
 
-	static final private int topicsPerPage = 10;
-	static final private int messagesPerPage = 10;
+	static final private int topicsPerPage = 21;
+	static final private int messagesPerPage = 21;
 	
 	@POST
 	@Path("/topic")

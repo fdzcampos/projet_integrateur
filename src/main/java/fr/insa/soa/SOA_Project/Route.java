@@ -5,6 +5,7 @@ import java.util.Iterator;
 
 public class Route {	
 	ArrayList<GPSPoint> route;
+	double length;
 
 	public Route(){
 		route = new ArrayList<GPSPoint>();
@@ -52,4 +53,12 @@ public class Route {
 		  }
 		  return distance;
 		}
+	
+	public double getLength() {
+		return length;
+	}
+
+	public void setLength(double length) {
+		this.length = length;
+	}
 }
