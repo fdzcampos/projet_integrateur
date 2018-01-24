@@ -41,8 +41,7 @@ public class ForumManager {
 		Connection connection = null;
 		Statement state = null;
 		try {		
-			connection = DriverManager.getConnection("jdbc:postgresql://18.194.236.50:5432/ilsoa", "ilsoa",
-				"ilsoa");
+			connection = DriverManager.getConnection("jdbc:postgresql://18.194.236.50:5432/ilsoa", "ilsoa", "ilsoa");
 			state = connection.createStatement();
 			String query = "INSERT INTO topics(title, date, userId) VALUES ('" + topic.getTitle() + "', now(), " + topic.getUser().getId() + ");";
 			query += "INSERT INTO messages(text, date, topicId, userId) VALUES ('" + topic.getMessages().get(0).getText() + "', now(), ( SELECT id FROM topics ORDER BY id DESC LIMIT 1 ), " + topic.getUser().getId() + ");";
@@ -99,7 +98,7 @@ public class ForumManager {
 			connection = DriverManager.getConnection("jdbc:postgresql://18.194.236.50:5432/ilsoa", "ilsoa",
 				"ilsoa");
 			state = connection.createStatement();
-			String query = "SELECT t.id, t.title, t.date, t.nbMessages, u.name "
+			String query = "SELECT t.id, t.title, t.date, t.nbMessages, u.username "
 						 + "FROM topics t, users u "
 						 + "WHERE t.userId = u.id "
 						 + "OFFSET " + topicsPerPage * (page - 1) + " "
@@ -110,7 +109,7 @@ public class ForumManager {
 			
 	         while( res.next() ) {
 	        	User user = new User();
-	        	user.setName(res.getString("name"));
+	        	user.setUsername(res.getString("username"));
 	        	Topic topic = new Topic();
 	        	topic.setId(res.getInt("id"));
 	        	topic.setTitle(res.getString("title"));
@@ -226,7 +225,7 @@ public class ForumManager {
 			connection = DriverManager.getConnection("jdbc:postgresql://18.194.236.50:5432/ilsoa", "ilsoa",
 				"ilsoa");
 			state = connection.createStatement();
-			String query = "SELECT DISTINCT m.text, m.date, u.name "
+			String query = "SELECT DISTINCT m.text, m.date, u.username "
 						 + "FROM messages m, users u, topics t "
 						 + "WHERE m.userId = u.id "
 						 + "AND m.topicId = " + topic + " "
@@ -238,7 +237,7 @@ public class ForumManager {
 			
 	         while( res.next() ) {
 	        	User user = new User();
-	        	user.setName(res.getString("name"));
+	        	user.setUsername(res.getString("username"));
 	        	Message message = new Message();
 	        	message.setText(res.getString("text"));
 	        	message.setDate(res.getTimestamp("date"));

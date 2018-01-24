@@ -80,7 +80,8 @@ public class ShortestPath {
 		route.addGPSPoint(40.749825, -73.987963);
 		route.addGPSPoint(40.752946, -73.987384);
 		route.addGPSPoint(40.755823, -73.986397);
-
+		route.setLength(route.distanceInKm());
+		
 		return route;
 	}
 }

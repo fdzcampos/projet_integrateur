@@ -65,7 +65,7 @@
                     </li>
                     <li>
                     	<p>
-	                       <a href="partners.jsp">
+	                       <a href="partners">
 	                           <i class="pe-7s-bell"></i>
 	                           Partners
 	                       </a>

@@ -52,7 +52,7 @@ public class Servlet_forum extends HttpServlet {
 		client = ClientBuilder.newClient();
 	    target = client.target("http://localhost:8080/SOA_Project/webapi/forum/topic/page/" + page);
 	    topics = target.request(MediaType.APPLICATION_JSON)
-	    				 .get(ArrayList.class);
+	    			   .get(ArrayList.class);
 	    
 	    boolean moreTopics = topics.size() > 20;
 	    

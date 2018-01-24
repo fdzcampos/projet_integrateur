@@ -53,7 +53,6 @@ public class Servlet_login extends HttpServlet {
 			
 			HttpSession session = request.getSession();
 			session.setAttribute("user", email);
-<<<<<<< HEAD
 			
 			try {
 				session.setAttribute("isadmin", Postgres.isAdmin(email));
@@ -62,10 +61,6 @@ public class Servlet_login extends HttpServlet {
 				e.printStackTrace();
 			}
 
-
-=======
-		
->>>>>>> 7e504196501de7a9dc83a24f4c02087bcc50ef4b
 			getServletContext().getRequestDispatcher("/dashboard.jsp").forward(request, response);
 		}			
 	}
