@@ -22,10 +22,10 @@ import fr.insa.soa.SOA_Project.Topic;
 import fr.insa.soa.SOA_Project.Message;
 
 /**
- * Servlet implementation class Servlet_forum
+ * Servlet implementation class Servlet_topic
  */
-@WebServlet("/forum")
-public class Servlet_forum extends HttpServlet {
+@WebServlet("/forum/topic")
+public class Servlet_topic extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Client client;
 	private WebTarget target;
@@ -33,7 +33,7 @@ public class Servlet_forum extends HttpServlet {
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public Servlet_forum() {
+    public Servlet_topic() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -42,32 +42,32 @@ public class Servlet_forum extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		int idTopic = Integer.parseInt(request.getParameter("idTopic"));
 		int page = 1;
 		String pageParam = request.getParameter("page");
 		if(pageParam != null){
 			page = Integer.parseInt(pageParam);
 		}
 		
-		ArrayList<Topic> topics = new ArrayList<Topic>();
+		ArrayList<Message> messages = new ArrayList<Message>();
 		client = ClientBuilder.newClient();
-	    target = client.target("http://localhost:8080/SOA_Project/webapi/forum/topic/page/" + page);
-	    topics = target.request(MediaType.APPLICATION_JSON)
+	    target = client.target("http://localhost:8080/SOA_Project/webapi/forum/topic/" + idTopic + "/page/" + page);
+	    messages = target.request(MediaType.APPLICATION_JSON)
 	    				 .get(ArrayList.class);
 	    
-	    boolean moreTopics = topics.size() > 20;
+	    boolean moreMessages = messages.size() > 20;
 	    
-		request.setAttribute("topics", topics);
-		request.setAttribute("moreTopics", moreTopics);
-		request.getRequestDispatcher("forum.jsp").forward(request, response);
+		request.setAttribute("messages", messages);
+		request.setAttribute("moreMessages", moreMessages);
+		request.getRequestDispatcher("topic.jsp").forward(request, response);
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
 		String messageText = request.getParameter("message"); // A faire correspondre avec les noms des champs du formulaire
-		String title = request.getParameter("title");
+		int topicId = Integer.parseInt(request.getParameter("idTopic"));
 		int userId = 2;
 		// int userId = request.getSession().getAttribute("userId"); // Le vrai userId
 		
@@ -75,23 +75,20 @@ public class Servlet_forum extends HttpServlet {
 	   
 	    JSONObject user = new JSONObject();
 	    user.put("id", new Integer(userId));
-	  
-	    List<Message> messages = new ArrayList<Message>();
-	    Message message = new Message();
-	    message.setText(messageText);
-	    messages.add(message);
 	    
-	    jsonBody.put("title", title);
+	    JSONObject topic = new JSONObject();
+	    topic.put("id", new Integer(topicId));
+	  
+	    jsonBody.put("message", messageText);
+	    jsonBody.put("topic", topic);
 	    jsonBody.put("user", user);
-	    jsonBody.put("messages", messages);
 
 	    Entity<String> postBody = Entity.json(jsonBody.toJSONString());
 	
 		client = ClientBuilder.newClient();
-	    target = client.target("http://localhost:8080/SOA_Project/webapi/forum/topic");
+	    target = client.target("http://localhost:8080/SOA_Project/webapi/forum/message");
 	    
 	    Response serviceResponse = target.request(MediaType.APPLICATION_JSON).post(postBody);
-	    
 	    
 	    // ADD ANY KAFKA THINGY HERE
 

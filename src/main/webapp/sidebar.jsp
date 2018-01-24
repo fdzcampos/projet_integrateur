@@ -63,6 +63,14 @@
 	                        </a>
                         </p>
                     </li>
+                    <li>
+                    	<p>
+	                       <a href="partners.jsp">
+	                           <i class="pe-7s-bell"></i>
+	                           Partners
+	                       </a>
+                        </p>
+                    </li>
 	                <li>
                     	<p>
 	                       <a href="notifications.jsp">
