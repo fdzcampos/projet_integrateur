@@ -80,8 +80,6 @@
 
 <div class="wrapper">
     <%@ include file="sidebar.jsp" %>
-        
-        
     <div class="main-panel">
 		<nav class="navbar navbar-default navbar-fixed">
             <div class="container-fluid">
@@ -164,6 +162,7 @@
         </nav>
 
         
+          
         <style>
                                 #menu {
                                     position: absolute;
@@ -211,337 +210,332 @@
 
         </style>
                             
-                            <div id='map'></div>
-        
-                            <pre id='info'></pre>
-                            <div id='menu'>
-                                <input id='basic' type='radio' name='rtoggle' value='basic' checked='checked'>
-                                <label for='basic'>basic</label>
-                                <input id='streets' type='radio' name='rtoggle' value='streets'>
-                                <label for='streets'>streets</label>
-                                <input id='bright' type='radio' name='rtoggle' value='bright'>
-                                <label for='bright'>bright</label>
-                                <input id='light' type='radio' name='rtoggle' value='light'>
-                                <label for='light'>light</label>
-                                <input id='dark' type='radio' name='rtoggle' value='dark'>
-                                <label for='dark'>dark</label>
-                                <input id='satellite' type='radio' name='rtoggle' value='satellite'>
-                                <label for='satellite'>satellite</label>
-                                <div > 
-                                    <button type="button" id="buttonCalculateDistance" class="btn btn-info" onclick="location.href='#';" >Calculate distance</button>
-                                </div>
-                            </div>
-                            <pre id='info_click'> Select your origin and destination. </pre>
-        
-                           
-        
-                        <script>
-                            
-                            mapboxgl.accessToken = 'pk.eyJ1Ijoib2JhZGFvdWkiLCJhIjoiY2pjaXJld3B6MDg0ZzJ3bHh1NXgyYWc5eCJ9.5WB96eoC4E7TDB5P8ofsQw';
-                            var map = new mapboxgl.Map({
-                                container: 'map',
-                                style: 'mapbox://styles/mapbox/basic-v9',
-                                zoom: 2,
-                                center: [-120, 50]
-                            });
+                 <div id='map'></div>
 
-                            var layerList = document.getElementById('menu');
-                            var inputs = layerList.getElementsByTagName('input');
+                 <pre id='info'></pre>
+                 <div id='menu'>
+                     <input id='basic' type='radio' name='rtoggle' value='basic' checked='checked'>
+                     <label for='basic'>basic</label>
+                     <input id='streets' type='radio' name='rtoggle' value='streets'>
+                     <label for='streets'>streets</label>
+                     <input id='bright' type='radio' name='rtoggle' value='bright'>
+                     <label for='bright'>bright</label>
+                     <input id='light' type='radio' name='rtoggle' value='light'>
+                     <label for='light'>light</label>
+                     <input id='dark' type='radio' name='rtoggle' value='dark'>
+                     <label for='dark'>dark</label>
+                     <input id='satellite' type='radio' name='rtoggle' value='satellite'>
+                     <label for='satellite'>satellite</label>
+                     <div > 
+                         <button type="button" id="buttonCalculateDistance" class="btn btn-info" onclick="location.href='#';" >Calculate distance</button>
+                     </div>
+                     <div > 
+                         <button type="button" id="generateReport" class="btn btn-info" onclick="location.href='#';" >Generate report</button>
+                     </div>
+                 </div>
+                 <pre id='info_click'> Select your origin and destination. </pre>
 
-                            function switchLayer(layer) {
-                                var layerId = layer.target.id;
-                                map.setStyle('mapbox://styles/mapbox/' + layerId + '-v9');
-                            }
+                
 
-                            for (var i = 0; i < inputs.length; i++) {
-                                inputs[i].onclick = switchLayer;
-                            }
-                                
-                                // add zoom menu            
+             <script>
+                    
+                    mapboxgl.accessToken = 'pk.eyJ1Ijoib2JhZGFvdWkiLCJhIjoiY2pjaXJld3B6MDg0ZzJ3bHh1NXgyYWc5eCJ9.5WB96eoC4E7TDB5P8ofsQw';
+                    var map = new mapboxgl.Map({
+                        container: 'map',
+                        style: 'mapbox://styles/mapbox/basic-v9',
+                        zoom: 2,
+                        center: [-120, 50]
+                    });
 
-                                // Add zoom and rotation controls to the map.
-                                map.addControl(new mapboxgl.NavigationControl());
-                                
-                                //show coordinates 
-                                map.on('mousemove', function (e) {
-                                    document.getElementById('info').innerHTML =
-                                        // e.point is the x, y coordinates of the mousemove event relative
-                                        // to the top-left corner of the map
-                                        JSON.stringify(e.point) + '<br />' +
+                    var layerList = document.getElementById('menu');
+                    var inputs = layerList.getElementsByTagName('input');
+
+                    function switchLayer(layer) {
+                        var layerId = layer.target.id;
+                        map.setStyle('mapbox://styles/mapbox/' + layerId + '-v9');
+                    }
+
+                    for (var i = 0; i < inputs.length; i++) {
+                        inputs[i].onclick = switchLayer;
+                    }
+                        
+                        // add zoom menu            
+
+                        // Add zoom and rotation controls to the map.
+                        map.addControl(new mapboxgl.NavigationControl());
+                        
+                        //show coordinates 
+                        map.on('mousemove', function (e) {
+                            document.getElementById('info').innerHTML =
+                                // e.point is the x, y coordinates of the mousemove event relative
+                                // to the top-left corner of the map
+                                JSON.stringify(e.point) + '<br />' +
+                                // e.lngLat is the longitude, latitude geographical position of the event
+                                JSON.stringify(e.lngLat);
+                                });
+                        
+                        // test to have coords in a variable
+                        var coordinates1;
+                        var coordinates2; 
+                        var long1=null; 
+                        var long2=null; 
+                        var lat1=null; 
+                        var lat2=null; 
+                        var flip=false; 
+                        var deleteLayerLine = false; 
+                        var id = 0; 
+                        var idLine = 0; 
+                        
+                     // to test line drawings: 
+var lineCoord = { 
+		"route": [ 
+			{ 
+				"lat": 8.656014599557707, 
+				"lon": -56.367208957721914
+			}, 
+			{ 
+				"lat": 7.261360896162202, 
+				"lon": -42.02343106263544
+			}, 
+			{ 
+				"lat": 8.654033861251491, 
+				"lon": -30.210939645702183
+			}, 
+			{ 
+				"lat": 12.523689086199, 
+				"lon": -22.054685354164434
+			}, 
+			{ 
+				"lat": 14.849806005146106, 
+				"lon": -16.816406250135202
+			} 
+			]
+		}; 
+
+var listCoords = lineCoord.route; // on recup la liste de paires de long/lat 
+var goodCoords=[]; 
+
+               /*             var layers = map.getStyle().layers;
+                            // Find the index of the first symbol layer in the map style
+                            var firstSymbolId;
+                            for (var i = 0; i < layers.length; i++) {
+                                if (layers[i].type === 'symbol') {
+                                    firstSymbolId = layers[i].id;
+                                    break;
+                                }
+                            }*/
+
+                                 map.on('click', function(e){ 
+
+                                     if (flip==false){ 
+                                         coordinates1 = JSON.stringify(e.point) + '<br />' +
                                         // e.lngLat is the longitude, latitude geographical position of the event
                                         JSON.stringify(e.lngLat);
-                                        });
-                                
-                                // test to have coords in a variable
-                                var coordinates1;
-                                var coordinates2; 
-                                var long1=null; 
-                                var long2=null; 
-                                var lat1=null; 
-                                var lat2=null; 
-                                var flip=false; 
-                                var deleteLayerLine = false; 
-                                var id = 0; 
-                                var idLine = 0; 
-                                
-                       /*             var layers = map.getStyle().layers;
-                                    // Find the index of the first symbol layer in the map style
-                                    var firstSymbolId;
-                                    for (var i = 0; i < layers.length; i++) {
-                                        if (layers[i].type === 'symbol') {
-                                            firstSymbolId = layers[i].id;
-                                            break;
-                                        }
-                                    }*/
-
-                                         map.on('click', function(e){ 
-
-                                             if (flip==false){ 
-                                                 coordinates1 = JSON.stringify(e.point) + '<br />' +
-                                                // e.lngLat is the longitude, latitude geographical position of the event
-                                                JSON.stringify(e.lngLat);
-                                                 long1= e.lngLat.lng// JSON.stringify(e.lngLat).substr(7, 17); 
-                                                 lat1= e.lngLat.lat //JSON.stringify(e.lngLat).substr(32, 48);
-                                                 flip=true; 
-                                                 
-                                                 
-                                                 var elementExists = map.getLayer('points'+(id-1));
-                                                 if ( elementExists !=null) {
-                                                     
-                                                    console.log("coucou " + elementExists.id  + " " + id ); 
-
-                                                     
-                                                    map.removeLayer("points"+(id-1)); 
-                                                 }
-                                                 
-                                                id++; 
-
-                                                                                                  
-                                                  map.addLayer({
-                                                    "id": "points"+id,
-                                                    "type": "symbol",
-                                                    "source": {
-                                                        "type": "geojson",
-                                                        "data": {
-                                                            "type": "FeatureCollection",
-                                                            "features": [{
-                                                                "type": "Feature",
-                                                                "geometry": {
-                                                                    "type": "Point",
-                                                                    "coordinates": [long1, lat1]
-                                                                },
-                                                                "properties": {
-                                                                    "title": "FROM",
-                                                                    "icon": "monument"
-                                                                }
-                                                            }]
-                                                        }
-                                                    },
-                                                    "layout": {
-                                                        "icon-image": "{icon}-15",
-                                                        "text-field": "{title}",
-                                                        "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
-                                                        "text-offset": [0, 0.6],
-                                                        "text-anchor": "top"
-                                                    }
-                                                });
+                                         long1= e.lngLat.lng// JSON.stringify(e.lngLat).substr(7, 17); 
+                                         lat1= e.lngLat.lat //JSON.stringify(e.lngLat).substr(32, 48);
+                                         flip=true; 
                                          
+                                         
+                                         var elementExists = map.getLayer('points'+(id-1));
+                                         if ( elementExists !=null) {
+                                             
+                                            console.log("coucou " + elementExists.id  + " " + id ); 
 
+                                             
+                                            map.removeLayer("points"+(id-1)); 
+                                         }
+                                         
+                                        id++; 
 
-                                             }
-                                            else { 
-                                            coordinates2 = JSON.stringify(e.point) + '<br />' +
-                                                // e.lngLat is the longitude, latitude geographical position of the event
-                                                JSON.stringify(e.lngLat);
-
-
-
-                                                long2=  e.lngLat.lng  ; //JSON.stringify(e.lngLat).substr(7, 17); 
-                                                 lat2= e.lngLat.lat ; //JSON.stringify(e.lngLat).substr(32, 48);
-                                                 flip= false;
-                                              
-
-                                                var elementExists = map.getLayer('points'+(id-1)); 
-                                                 if ( elementExists !=null) {
-                                                     
-                                                 console.log("hello " + elementExists.id  + " " + id ); 
-
-                                                    map.removeLayer("points"+(id-1)); 
-                                                 }
-                                                   id++; 
-
-                                                
-                                               map.addLayer({
-                                                    "id": "points"+id,
-                                                    "type": "symbol",
-                                                    "source": {
-                                                        "type": "geojson",
-                                                        "data": {
-                                                            "type": "FeatureCollection",
-                                                            "features": [{
-                                                                "type": "Feature",
-                                                                "geometry": {
-                                                                    "type": "Point",
-                                                                    "coordinates": [long2, lat2]
-                                                                },
-                                                                "properties": {
-                                                                    "title": "TO",
-                                                                    "icon": "harbor"
-                                                                }
-                                                            }]
+                                                                                          
+                                          map.addLayer({
+                                            "id": "points"+id,
+                                            "type": "symbol",
+                                            "source": {
+                                                "type": "geojson",
+                                                "data": {
+                                                    "type": "FeatureCollection",
+                                                    "features": [{
+                                                        "type": "Feature",
+                                                        "geometry": {
+                                                            "type": "Point",
+                                                            "coordinates": [long1, lat1]
+                                                        },
+                                                        "properties": {
+                                                            "title": "FROM",
+                                                            "icon": "monument"
                                                         }
-                                                    },
-                                                    "layout": {
-                                                        "icon-image": "{icon}-15",
-                                                        "text-field": "{title}",
-                                                        "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
-                                                        "text-offset": [0, 0.6],
-                                                        "text-anchor": "top"
-                                                    }
-                                                });
-                                                 
-                                                
-									var lineCoord = { 
-											"route": [ 
-												{ 
-													"lat": 8.656014599557707, 
-													"lon": -56.367208957721914
-												}, 
-												{ 
-													"lat": 7.261360896162202, 
-													"lon": -42.02343106263544
-												}, 
-												{ 
-													"lat": 8.654033861251491, 
-													"lon": -30.210939645702183
-												}, 
-												{ 
-													"lat": 12.523689086199, 
-													"lon": -22.054685354164434
-												}, 
-												{ 
-													"lat": 14.849806005146106, 
-													"lon": -16.816406250135202
-												} 
-												]
-											}; 
-									
-									var listCoords = lineCoord.route; // on recup la liste de paires de long/lat 
-									var goodCoords=[]; 
-									
-									for ( i = 0 ; i < listCoords.length ; i++){ 
-										
-										goodCoords.push([listCoords[i].lon, listCoords[i].lat]) ; 
-									}
-									
-									window.alert(JSON.stringify(goodCoords)); 
-									
-
-										
-                                                 // Add a line between coordinates 1 and 2 
-                                                 
-                                           var layerLineExists = map.getLayer('route'+(idLine-1)); 
-                                                 if ( elementExists !=null) {
-                                                     
-                                                 console.log("hello " + layerLineExists.id  + " " + idLine ); 
-
-                                                    map.removeLayer("route"+(idLine-1)); 
-                                                 }
-                                                   idLine++; 
-
-
-                                            map.addLayer({
-                                                    "id": "route"+id,
-                                                    "type": "line",
-                                                    "source": {
-                                                        "type": "geojson",
-                                                        "data": {
-                                                            "type": "Feature",
-                                                            "properties": {},
-                                                            "geometry": {
-                                                                "type": "LineString",
-                                                                "coordinates": goodCoords
-                                                            }
-                                                        }
-                                                    },
-                                                    "layout": {
-                                                        "line-join": "round",
-                                                        "line-cap": "round"
-                                                    },
-                                                    "paint": {
-                                                        "line-color": "#f00",
-                                                        "line-width": 8
-                                                    }
-                                                }); // , firstSymbolId);
-
+                                                    }]
+                                                }
+                                            },
+                                            "layout": {
+                                                "icon-image": "{icon}-15",
+                                                "text-field": "{title}",
+                                                "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+                                                "text-offset": [0, 0.6],
+                                                "text-anchor": "top"
                                             }
+                                        });
+                                 
 
 
-                                          document.getElementById('info_click').innerHTML = 
-                                              'First point: ' + coordinates1 + '<br />' + 'Second point:' + coordinates2 ;
-                                          
-                                          
+                                     }
+                                    else { 
+                                    coordinates2 = JSON.stringify(e.point) + '<br />' +
+                                        // e.lngLat is the longitude, latitude geographical position of the event
+                                        JSON.stringify(e.lngLat);
 
 
 
-        /*                                    document.getElementById('info_click').innerHTML = 
-                                                // e.point is the x, y coordinates of the mousemove event relative
-                                                // to the top-left corner of the map
-                                                JSON.stringify(e.point) + '<br />' +
-                                                // e.lngLat is the longitude, latitude geographical position of the event
-                                                JSON.stringify(e.lngLat);*/
+                                        long2=  e.lngLat.lng  ; //JSON.stringify(e.lngLat).substr(7, 17); 
+                                         lat2= e.lngLat.lat ; //JSON.stringify(e.lngLat).substr(32, 48);
+                                         flip= false;
+                                      
+
+                                        var elementExists = map.getLayer('points'+(id-1)); 
+                                         if ( elementExists !=null) {
+                                             
+                                         console.log("hello " + elementExists.id  + " " + id ); 
+
+                                            map.removeLayer("points"+(id-1)); 
+                                         }
+                                           id++; 
+
+                                        
+                                       map.addLayer({
+                                            "id": "points"+id,
+                                            "type": "symbol",
+                                            "source": {
+                                                "type": "geojson",
+                                                "data": {
+                                                    "type": "FeatureCollection",
+                                                    "features": [{
+                                                        "type": "Feature",
+                                                        "geometry": {
+                                                            "type": "Point",
+                                                            "coordinates": [long2, lat2]
+                                                        },
+                                                        "properties": {
+                                                            "title": "TO",
+                                                            "icon": "harbor"
+                                                        }
+                                                    }]
+                                                }
+                                            },
+                                            "layout": {
+                                                "icon-image": "{icon}-15",
+                                                "text-field": "{title}",
+                                                "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+                                                "text-offset": [0, 0.6],
+                                                "text-anchor": "top"
+                                            }
+                                        });
+                                         
+                            
+
+                                    }
 
 
-                                            });
+                                  document.getElementById('info_click').innerHTML = 
+                                      'First point: ' + coordinates1 + '<br />' + 'Second point:' + coordinates2 ;
+                                                                        
 
-                               
+                                    });
+
+                      
+                                  var element = document.getElementById("buttonCalculateDistance"); 
+                                  element.addEventListener("click", sendToCalculator);
+
+                                  //var elementReport = document.getElementById("generateReport"); 
+                                  //elementReport.addEventListener("click", sendToReport);
                                   
-                              //       });
-                              
-                                          var element = document.getElementById("buttonCalculateDistance"); 
-                                          element.addEventListener("click", sendToCalculator);
+                                  var shortestPath;
+                                  
+                                  
+                                  function sendToCalculator() { 
+                                	  if (long1==null || lat1==null || long2==null || lat2==null){ 
+                                		  window.alert("Please select two points before clicking.");
+                                		  
+                                	  }
+                                	  else { 
+                                 	 
+                                		  var gpsPoints = {"route": [{"lat" : lat1, "lon" : long1}, {"lat" : lat2, "lon" : long2}]};
+  										   	  
+                                		  var xhttp = new XMLHttpRequest();
+                                		  xhttp.onreadystatechange = function() {
+                                		  	if(this.readyState == 4 && this.status == 200){
+                                		  		window.alert(this.responseText);
+                                		  		shortestPath = JSON.parse(this.responseText);
+                                		  		var listCoords = shortestPath.route; // on recup la liste de paires de long/lat 
+                                		  		var goodCoords=[]; 
+                                		  		var hello = "http://localhost:8080/SOA_Project/webapi/report/pdf/";
+                                		  		
+                                		  		
+                                		  		for ( i = 0 ; i < listCoords.length ; i++){ 
+              										goodCoords.push([listCoords[i].lon, listCoords[i].lat]) ; 
+              										hello += listCoords[i].lat + "," + listCoords[i].lon;
+              										if(i < listCoords.length - 1){
+              											hello += "%7C";
+              										}
+              									}
+                                		  		window.alert(hello);
+                 
+                                		  		document.getElementById("generateReport").onclick = function(){location.href=hello;};
+                                	
+                                		  		// Add a line between coordinates 1 and 2 
+                                                
+                                         		var layerLineExists = map.getLayer('route'+(idLine-1)); 
+                                               	if ( layerLineExists !=null) {
+                                                   
+                                               console.log("hello " + layerLineExists.id  + " " + idLine ); 
 
-                                          function sendToCalculator() {
-                                        	  if (long1==null || lat1==null || long2==null || lat2==null){ 
-                                        		  window.alert("Please select two points before clicking.")
-                                        		  
-                                        	  }
-                                        	  else { 
-	                                        	  window.alert("YO YOU CLICKED BRUH"); 
-	                                        	  gpsPoints = {"route": [{"lat": lat1, "lon": long1}, {"lat":lat2, "lon":long2}]}; 
-	
-	                                        	  window.alert("YOu suck"); 
-	                                        	  
-	                                        	  var xhttp = new XMLHttpRequest(); 
-	                                        	  
-	                                        	  xhttp.onreadystatechange=function() { 
-	                                            	  window.alert("*hacker voice* Im in"); 
-	
-	                                        		  if (this.readyState==4 && this.status==200){ 
-	                                        			  
-	                                        			  window.alert(this.responseText); 
-	                                        		  }                            
-	                                        		  
-	                                        	  }; 
-	                                        	  
-	                                        	  window.alert("let's open yo"); 
-	
-	                                        	  xhttp.open("POST", "webapi/shortestpath/route", false); 
-	                                        	  window.alert("snowhite"); 
-	
-	                                        	  xhttp.send(JSON.stringify(gpsPoints)); 
-	                                        	  
-	                                        	    window.alert("sent to services"); 
-                                        	  }
-                                        	}
-                                
-                                                            
-                                
-                            </script>
+                                                  map.removeLayer("route"+(idLine-1)); 
+                                               }
+                                                 idLine++; 
+                                                 
+                                                 map.addLayer({
+                                                     "id": "route"+id,
+                                                     "type": "line",
+                                                     "source": {
+                                                         "type": "geojson",
+                                                         "data": {
+                                                             "type": "Feature",
+                                                             "properties": {},
+                                                             "geometry": {
+                                                                 "type": "LineString",
+                                                                 "coordinates": goodCoords
+                                                             }
+                                                         }
+                                                     },
+                                                     "layout": {
+                                                         "line-join": "round",
+                                                         "line-cap": "round"
+                                                     },
+                                                     "paint": {
+                                                         "line-color": "#f00",
+                                                         "line-width": 8
+                                                     }
+                                                 }); // , firstSymbolId);
+                                                 
+				                                   //reinit goodcoords
+				                                   goodCoords=[]; 
+                                		  	}	
+                                		  };
+                                		  
+                                		  xhttp.open("POST", "webapi/shortestpath/route", false); 
+                                		  xhttp.setRequestHeader("Content-type", "application/json");
+                                		  xhttp.send(JSON.stringify(gpsPoints)); 
+                                	  }
+                                	}
+                        
+                                                    
+                        
+                    </script>
         
         
+        
 
-      </div>
+    </div>
 </div>
 
 

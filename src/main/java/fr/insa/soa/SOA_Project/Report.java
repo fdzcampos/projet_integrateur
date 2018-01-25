@@ -68,21 +68,12 @@ public class Report {
 			} catch (UnsupportedEncodingException e1) {
 				e1.printStackTrace();
 			}
-			/*for(GPSPoint point : route.getRoute()){
-				urlCoordinates += point.getLat() + "," + point.getLon() + "|";
-			}
-			if(!urlCoordinates.equals("")){
-				urlCoordinates = urlCoordinates.substring(0, urlCoordinates.length()-1);
-			}*/
+
 			System.out.println(urlPrefix + urlCoordinates + urlSuffix);
-			//http://localhost:8080/SOA_Project/webapi/report/pdf/40.737102,-73.990318%7C40.749825,-73.987963%7C40.752946,-73.987384%7C40.755823,-73.986397
-			//40.737102,-73.990318|40.749825,-73.987963|40.752946,-73.987384|40.755823,-73.986397
 			
 			Image image;
 			try {
 				image = Image.getInstance(urlPrefix + urlCoordinates + urlSuffix);
-				//image = Image.getInstance("http://maps.googleapis.com/maps/api/staticmap?size=400x400&path=40.737102,-73.990318|40.749825,-73.987963|40.752946,-73.987384|40.755823,-73.986397&sensor=false");
-				//image.scaleToFit((float)200.0, (float)49.0);
 				document.add(image);
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -108,7 +99,6 @@ public class Report {
 		
 		// Return the pdf to the web browser
 		File file = new File(pdfFile);
-		//File file = new File("C:/Users/Alexis Zamar/Documents/INSA/4IR_1617.pdf");
 		ResponseBuilder response = Response.ok((Object) file);
 	    response.header("Content-Disposition",  "filename=restfile.pdf");
 	    

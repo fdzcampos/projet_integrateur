@@ -28,6 +28,11 @@ public class ShortestPath {
 	private Client client;
 	private WebTarget target;
 	
+	
+	private int conversion(GPSPoint point){
+		return ( 90 - (int)Math.round(10 * point.getLat()) / 10 ) * 10 * 3600 + ( (int)Math.round(10 * point.getLon()) / 10 + 180 ) * 10;
+	}
+	
 	@POST
 	@Path("/route")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -37,9 +42,11 @@ public class ShortestPath {
 		
 		GPSPoint p1 = route.getRoute().get(0);
 		GPSPoint p2 = route.getRoute().get(1);
+		int id1 = conversion(p1);
+		int id2 = conversion(p2);
 		
 		System.out.println("P1[ " + p1.getLon() + ", " + p1.getLat() + " ]    P2[ " + p2.getLon() + ", " + p2.getLat() + " ]");
-		
+		System.out.println("P1[ " + id1 + " ]    P2[ " + id2 + " ]");
 		// Take care of neo4j authentication
 		HttpAuthenticationFeature feature = HttpAuthenticationFeature.basicBuilder()
 			    .nonPreemptive()
@@ -56,16 +63,16 @@ public class ShortestPath {
 	    JSONObject neo4jRequestBody = new JSONObject();
 	    
 	    // Il faudra changer la requète et le body JSON qui contient les paramètres
-	    String neo4jQuery = "MATCH (p1:Point{id:678}),(p2:Point{id:677}),p=shortestPath((p1)-[*]-(p2)) return p";
+	    String neo4jQuery = "match (p1:Point{id:{id1}}),(p2:Point{id:{id2}}) CALL apoc.algo.aStar(p1,p2,'Link','distance','x','y')YIELD path,weight UNWIND range(0,size(nodes(path)),toInt(size(nodes(path))/100)) as idx RETURN nodes(path)[idx] ,weight";
 	    
 	    JSONObject neo4jParams = new JSONObject();
-	    neo4jParams.put("id1", new Integer(2254));
-	    //neo4jParams.put("id2", new Integer(2254));
+	    neo4jParams.put("id1", new Integer(4214360));
+	    neo4jParams.put("id2", new Integer(2400720));
 	    
 	    neo4jRequestBody.put("query", neo4jQuery);
 	    neo4jRequestBody.put("params", neo4jParams);
 	    
-	    //System.out.println(neo4jRequestBody);
+	    System.out.println(neo4jRequestBody);
 
 	    Entity<String> postBody = Entity.json(neo4jRequestBody.toJSONString());
 	    
@@ -82,28 +89,21 @@ public class ShortestPath {
 			// Create Route object with the GPS coordinates of each points
 			// Iterate over the JSONObject to fetch the points
 			
-			/*
 			JSONArray data = (JSONArray)neoRoute.get("data");
-			JSONArray points = (JSONArray) ((JSONArray) data.get(0)).get(0);
+			JSONArray points = (JSONArray) data;
 			for (int i = 0 ; i < points.size(); i++) {
-		        JSONObject p = (JSONObject) points.get(i);
+				JSONArray pArray = (JSONArray) points.get(i);
+		        JSONObject p = (JSONObject) pArray.get(0);
 		        JSONObject pData = (JSONObject) p.get("data");
-		        double x = 0.1 * Integer.parseInt((String) pData.get("x"));
-		        double y = 0.1 * Integer.parseInt((String) pData.get("y"));
-		        shortestRoute.addGPSPoint(x, y);
+		        double x = (double) pData.get("x");
+		        double y = (double) pData.get("y");
+		        shortestRoute.addGPSPoint(y, x);
 		    }
-			*/
+			
 		} catch (ParseException e) {
-			return route;
+			return shortestRoute;
 		}
-		
-		// Return dummy route
-		shortestRoute.addGPSPoint(40.737102, -73.990318);
-		shortestRoute.addGPSPoint(40.749825, -73.987963);
-		shortestRoute.addGPSPoint(40.752946, -73.987384);
-		shortestRoute.addGPSPoint(40.755823, -73.986397);
-		shortestRoute.setLength(shortestRoute.distanceInKm());
-		
+	
 		System.out.println("Got route");
 		return shortestRoute;
 	}
